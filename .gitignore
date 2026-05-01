@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+outputs/
+dataset/
+*.pt
+*.avi
+*.jpg
+*.png
+*.mp4
