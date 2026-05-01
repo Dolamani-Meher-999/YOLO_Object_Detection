@@ -116,7 +116,51 @@ elif option == "Video":
 
 # ---------------- WEBCAM DETECTION ----------------
 
+# ---------------- WEBCAM DETECTION ----------------
+
 elif option == "Webcam":
+
+    st.info("📷 Click 'Take Photo' to capture and detect objects in real-time.")
+
+    camera_image = st.camera_input("Take a Photo")
+
+    if camera_image is not None:
+
+        file_bytes = np.asarray(bytearray(camera_image.read()), dtype=np.uint8)
+        frame = cv2.imdecode(file_bytes, 1)
+
+        results = model(frame, conf=confidence)
+        annotated_frame = results[0].plot()
+
+        # Count persons
+        person_count = 0
+
+        if results[0].boxes is not None:
+            classes = results[0].boxes.cls
+            for cls in classes:
+                if int(cls) == 0:
+                    person_count += 1
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.subheader("Original Capture")
+            st.image(frame, channels="BGR")
+
+        with col2:
+            st.subheader("Detected Objects")
+            st.image(annotated_frame, channels="BGR")
+
+        # Stats below
+        st.markdown("---")
+        col3, col4 = st.columns(2)
+
+        with col3:
+            total_objects = len(results[0].boxes) if results[0].boxes is not None else 0
+            st.metric("Total Objects Detected", total_objects)
+
+        with col4:
+            st.metric("Persons Detected", person_count)
 
     run = st.checkbox("Start Webcam")
 
